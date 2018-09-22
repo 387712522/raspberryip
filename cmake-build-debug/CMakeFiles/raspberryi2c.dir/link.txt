@@ -1,0 +1,1 @@
+F:/cygwin64/bin/gcc.exe -g  -Wl,--enable-auto-import CMakeFiles/raspberryi2c.dir/src/raspberrypii2c.c.o  -o raspberryi2c.exe -Wl,--out-implib,libraspberryi2c.dll.a -Wl,--major-image-version,0,--minor-image-version,0 

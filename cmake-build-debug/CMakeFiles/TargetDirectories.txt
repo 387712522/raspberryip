@@ -1,0 +1,3 @@
+/cygdrive/g/raspberrypi/designPattern/raspberryi2c/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/cygdrive/g/raspberrypi/designPattern/raspberryi2c/cmake-build-debug/CMakeFiles/raspberryi2c.dir
+/cygdrive/g/raspberrypi/designPattern/raspberryi2c/cmake-build-debug/CMakeFiles/edit_cache.dir

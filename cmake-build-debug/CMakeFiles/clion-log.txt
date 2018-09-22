@@ -1,0 +1,4 @@
+C:\Users\BaoPuCao\.CLion2018.2\system\cygwin_cmake\bin\cmake.exe -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=F:/cygwin64/bin/make.exe -DCMAKE_C_COMPILER=F:/cygwin64/bin/gcc.exe -DCMAKE_CXX_COMPILER=F:/cygwin64/bin/g++.exe -G "CodeBlocks - Unix Makefiles" /cygdrive/g/raspberrypi/designPattern/raspberryi2c
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /cygdrive/g/raspberrypi/designPattern/raspberryi2c/cmake-build-debug

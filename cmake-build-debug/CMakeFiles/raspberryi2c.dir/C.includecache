@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/cygdrive/g/raspberrypi/designPattern/raspberryi2c/main.c
+stdio.h
+-
+linux/types.h
+-
+stdlib.h
+-
+fcntl.h
+-
+unistd.h
+-
+sys/types.h
+-
+sys/ioctl.h
+-
+errno.h
+-
+linux/i2c.h
+-
+linux/i2c-dev.h
+-
+
