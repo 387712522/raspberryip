@@ -1,8 +1,8 @@
 Target = popotwo
 TargetLibs := ./src/raspberrypii2c.a
-CC = gcc
-CPP = g++
-AR = ar
+CC = arm-linux-gnueabihf-gcc
+CPP = arm-linux-gnueabihf-g++
+AR = arm-linux-gnueabihf-ar
 CFLAGS := -I./include -lpthread
 CPPFLAGS :=-I./include -lpthread
 #LDFLAGS	+= -L./Lib
@@ -18,6 +18,9 @@ OBJ_C := $(patsubst %.c,%.o,$(wildcard ./src/*.c))
 
 libs:$(OBJ_C)
 	$(AR) -r -o $(TargetLibs) $(OBJ_C)
+
+$(OBJ_CPP):$(SRC_CPP)
+	$(CPP) $(CFLAGS) $(LDFLAGS) -c $^ -o $@
 
 
 all: $(OBJ_CPP) libs
