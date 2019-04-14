@@ -9,18 +9,20 @@ CPPFLAGS :=-I./include -lpthread
 #LDFLAGS := -L/usr/local/lib
 #LDLIBS    := -lwiringPi -lwiringPiDev -lpthread -lm
 
-
+SRC_ROOT = ./src
 SRC_CPP := $(wildcard ./src/*.cpp)
 SRC_C :=  $(wildcard ./src/*.c)
 
 OBJ_CPP := $(patsubst %.cpp,%.o,$(wildcard ./src/*.cpp))
 OBJ_C := $(patsubst %.c,%.o,$(wildcard ./src/*.c))
 
+
+
 libs:$(OBJ_C)
 	$(AR) -r -o $(TargetLibs) $(OBJ_C)
 
-$(OBJ_CPP):$(SRC_CPP)
-	$(CPP) $(CFLAGS) $(LDFLAGS) -c $^ -o $@
+$(SRC_ROOT)/%.o:$(SRC_ROOT)/%.cpp
+	$(CPP) $(CFLAGS) $(LDFLAGS) -o $@ $< -c
 
 
 all: $(OBJ_CPP) libs

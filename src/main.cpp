@@ -8,9 +8,13 @@
 #include <sys/ioctl.h>
 #include <errno.h>
 #include <memory.h>
+#include <math.h>
+#include <sys/time.h>
 //#include <linux/i2c.h>
 //#include <linux/i2c-dev.h>
 #include "../include/raspberrypii2c.h"
+#include "../include/Kalman.h"
+
 
 #define SELF_TEST_X_GYRO 0x00
 #define SELF_TEST_Y_GYRO 0x01
@@ -108,6 +112,14 @@ int main()
     int32 fd = -1;
     int32 createI2c = 0;
     I2CDeviceDesc i2cDevDesc;
+
+    //struct timeval tv;
+
+    Kalman cKalmanFilter;
+    struct timeval sTimeVal;
+    ulong currentMilliSecond = 0,milliSecondBackup = 0;
+
+
     printf("Hello, World!\n");
     printf("i2cOperation = %p \n",i2cOperation);
 
@@ -134,46 +146,52 @@ int main()
 
     usleep(10*1000);   //延时10ms
 
-    uint8 whoami = i2cOperation->readReg8(i2cOperation, mpu9255ID, 0x75);
+    int32 whoami = i2cOperation->readReg8(i2cOperation, mpu9255ID, 0x75);
     printf("whoami = 0x%x \n",whoami);
-
+    gettimeofday(&sTimeVal, NULL);
+    currentMilliSecond = milliSecondBackup = (ulong)(sTimeVal.tv_sec*1000 + sTimeVal.tv_usec/1000);
     while(1)
     {
         tempLValue = (unsigned char)i2cOperation->readReg8(i2cOperation, mpu9255ID, ACCEL_XOUT_L);
         tempHValue = (unsigned char)i2cOperation->readReg8(i2cOperation, mpu9255ID, ACCEL_XOUT_H);
         xAxisAccelValue = (tempHValue << 8) + tempLValue;
         xAxisAccel = (float)(xAxisAccelValue/16384.0);
-        printf("xAxisAccelValue = %f \n",xAxisAccel);
+       // printf("xAxisAccelValue = %f \n",xAxisAccel);
 
         tempLValue = (unsigned char)i2cOperation->readReg8(i2cOperation, mpu9255ID, ACCEL_YOUT_L);
         tempHValue = (unsigned char)i2cOperation->readReg8(i2cOperation, mpu9255ID, ACCEL_YOUT_H);
         yAxisAccelValue = (tempHValue << 8) + tempLValue;
         yAxisAccel = (float)(yAxisAccelValue/16384.0);
-        printf("yAxisAccelValue = %f \n",yAxisAccel);
+        //printf("yAxisAccelValue = %f \n",yAxisAccel);
 
         tempLValue = (unsigned char)i2cOperation->readReg8(i2cOperation, mpu9255ID, ACCEL_ZOUT_L);
         tempHValue = (unsigned char)i2cOperation->readReg8(i2cOperation, mpu9255ID, ACCEL_ZOUT_H);
         zAxisAccelValue = (tempHValue << 8) + tempLValue;
         zAxisAccel = (float)(zAxisAccelValue/16384.0);
-        printf("zAxisAccelValue = %f \n",zAxisAccel);
-        printf("---------------------\n");
+       // printf("zAxisAccelValue = %f \n",zAxisAccel);
+        double xAngle = atan(xAxisAccel/zAxisAccel)*180.0/3.1416;
+        printf("xAngle = %f \n", xAngle);
+        double yAngle = atan(yAxisAccel/zAxisAccel)*180.0/3.1416;
+        printf("yAngle = %f \n", yAngle);
+        //printf("---------------------\n");
+        //cKalmanFilter.setAngle(xAngle);
 
         tempLValue = (unsigned char)i2cOperation->readReg8(i2cOperation, mpu9255ID, GYRO_XOUT_L);
         tempHValue = (unsigned char)i2cOperation->readReg8(i2cOperation, mpu9255ID, GYRO_XOUT_H);
         xAxisGyroValue = (tempHValue << 8) + tempLValue;
-        xAxisGyro = xAxisGyroValue/32.8;
+        xAxisGyro = (float)(xAxisGyroValue/32.8);
         printf("xAxisGyroValue = %f \n",xAxisGyro);
 
         tempLValue = (unsigned char)i2cOperation->readReg8(i2cOperation, mpu9255ID, GYRO_YOUT_L);
         tempHValue = (unsigned char)i2cOperation->readReg8(i2cOperation, mpu9255ID, GYRO_YOUT_H);
         yAxisGyroValue = (tempHValue << 8) + tempLValue;
-        yAxisGyro = yAxisGyroValue/32.8;
+        yAxisGyro = (float)(yAxisGyroValue/32.8);
         printf("yAxisGyroValue = %f \n",yAxisGyro);
 
-        tempLValue = (unsigned char)i2cOperation->readReg8(i2cOperation, mpu9255ID, GYRO_ZOUT_L);
+        /*tempLValue = (unsigned char)i2cOperation->readReg8(i2cOperation, mpu9255ID, GYRO_ZOUT_L);
         tempHValue = (unsigned char)i2cOperation->readReg8(i2cOperation, mpu9255ID, GYRO_ZOUT_H);
         zAxisGyroValue = (tempHValue << 8) + tempLValue;
-        zAxisGyro = zAxisGyroValue/32.8;
+        zAxisGyro = (float)(zAxisGyroValue/32.8);
         printf("zAxisGyroValue = %f \n",zAxisGyro);
         printf("---------------------\n");
 
@@ -192,11 +210,18 @@ int main()
         zAxisMagnetoValue = (tempHValue << 8) + tempLValue;
         printf("zAxisGyroValue = 0x%d \n",zAxisMagnetoValue);
         printf("---------------------\n");
-
-
-
-
-        usleep(1000*1000);
+*/
+        gettimeofday(&sTimeVal, NULL);
+        currentMilliSecond = (ulong)(sTimeVal.tv_sec*1000 + sTimeVal.tv_usec/1000);
+        printf("currentMilliSecond = %ld \n", currentMilliSecond);
+        printf("milliSecondBackup = %ld \n",milliSecondBackup);
+        printf("currentMilliSecond - milliSecondBackup = %ld \n", currentMilliSecond - milliSecondBackup);
+        currentMilliSecond = currentMilliSecond - milliSecondBackup;
+        float xAxisGyroAngle = xAxisGyro*currentMilliSecond;
+        float kalmanXAngle = cKalmanFilter.getAngle(xAngle, xAxisGyroAngle, currentMilliSecond);
+        printf("kalmanXAngle = %f \n",kalmanXAngle);
+        printf("---------------------\n");
+        usleep(1000*10);
     }
 
 
